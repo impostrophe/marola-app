@@ -147,3 +147,28 @@ jobs:
             echo "::error file=flake.lock::missing or stale — commit the flake-lock artifact of this run (or run 'nix flake lock')"
             exit 1
           fi
+
+  # A called workflow's jobs can never exceed this; only its publish job writes (MIP-0074 §5.2).
+  api-docs:
+    uses: marola-dev/marola-devkit/.github/workflows/api-docs.yml@v0.9.0
+    permissions:
+      contents: write
+    with:
+      devkit-ref: v0.9.0
+
+  # The one check ci-rule requires in every marola repo (marola-dev/marola#813); it must report on
+  # every run, so it needs every other job and passes on skipped ones.
+  ci-ok:
+    if: always()
+    needs: [build-test, coverage, python, static, agents, flake-lock, api-docs]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: every needed job passed or was skipped
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for r in $RESULTS; do
+            case "$r" in success|skipped) ;; *) echo "::error::a needed job ended $r"; exit 1 ;; esac
+          done
