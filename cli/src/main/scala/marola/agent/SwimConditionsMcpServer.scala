@@ -8,7 +8,13 @@ import marola.beaches.BeachFinder
 import marola.json.JsonValue
 import marola.knowledge.OceanQa
 import marola.model.{Beach, BestHour, Coordinates}
-import marola.water.{BathingCondition, SamplingPoint, WaterQuality, WaterQualityClient, WaterQualityMatcher}
+import marola.water.{
+  BathingCondition,
+  SamplingPoint,
+  WaterQuality,
+  WaterQualityClient,
+  WaterQualityMatcher
+}
 import marola.{AppConfig, Recommender}
 
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper
